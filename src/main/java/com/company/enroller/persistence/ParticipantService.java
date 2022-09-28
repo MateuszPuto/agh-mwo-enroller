@@ -1,14 +1,18 @@
 package com.company.enroller.persistence;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 import org.hibernate.PersistentObjectException;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 import org.springframework.stereotype.Component;
 
 import com.company.enroller.model.Participant;
 
+import javax.persistence.EntityExistsException;
 import javax.servlet.http.HttpSession;
 
 @Component("participantService")
@@ -20,10 +24,11 @@ public class ParticipantService {
 		connector = DatabaseConnector.getInstance();
 	}
 
-	public Participant findByLogin(String login) {
+	public Optional<Participant> findByLogin(String login) {
 		Session session = connector.getSession();
-		Participant participant = session.get(Participant.class, login);
-		session.close();
+
+		Optional<Participant> participant = session.get(Participant.class, login) == null ?
+				Optional.empty() : Optional.of(session.get(Participant.class, login));
 
 		return participant;
 	}
@@ -37,16 +42,16 @@ public class ParticipantService {
 	public boolean addParticipant(Participant participant) {
 		Session session = connector.getSession();
 
-		try {
+		boolean success = false;
+		if(this.findByLogin(participant.getLogin()).isEmpty()) {
+			Transaction transaction = session.beginTransaction();
 			session.persist(participant);
+			transaction.commit();
 
-		} catch (PersistentObjectException e) {
-			return false;
+			success = true;
 		}
 
-		session.close();
-
-		return true;
+		return success;
 	}
 
 }
