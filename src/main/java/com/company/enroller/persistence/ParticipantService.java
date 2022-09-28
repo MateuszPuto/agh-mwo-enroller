@@ -54,4 +54,32 @@ public class ParticipantService {
 		return success;
 	}
 
+	public boolean deleteParticipant(Participant participant) {
+		Session session = connector.getSession();
+
+		boolean success = false;
+		if(this.findByLogin(participant.getLogin()).isPresent()) {
+			Transaction transaction = session.beginTransaction();
+			session.delete(participant);
+			transaction.commit();
+
+			success = true;
+		}
+
+		return success;
+	}
+
+	public boolean updateParticipant(Participant participant) {
+		Session session = connector.getSession();
+
+		boolean success = false;
+
+		if(this.findByLogin(participant.getLogin()).isPresent()) {
+			Transaction transaction = session.beginTransaction();
+			session.merge(participant);
+			transaction.commit();
+		}
+
+		return success;
+	}
 }

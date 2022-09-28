@@ -50,5 +50,25 @@ public class ParticipantRestController {
 		return new ResponseEntity(HttpStatus.OK);
 	}
 
+	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+	public ResponseEntity<?> deleteParticipant(@PathVariable("id") String login) {
+		boolean success = participantService.deleteParticipant(participantService.findByLogin(login).get());
 
+		if(!success) {
+			return new ResponseEntity(HttpStatus.BAD_REQUEST);
+		} else {
+			return new ResponseEntity(HttpStatus.OK);
+		}
+	}
+
+	@RequestMapping(value = "", method = RequestMethod.PUT)
+	public ResponseEntity<?> updateParticipant(@RequestBody Participant participant) {
+		boolean success = participantService.updateParticipant(participant);
+
+		if(!success) {
+			return new ResponseEntity(HttpStatus.BAD_REQUEST);
+		} else {
+			return new ResponseEntity(HttpStatus.OK);
+		}
+	}
 }
