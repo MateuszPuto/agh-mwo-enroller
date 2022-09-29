@@ -27,48 +27,60 @@ public class ParticipantRestController {
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	public ResponseEntity<?> getParticipant(@PathVariable("id") String login) {
 		Optional<Participant> participant = participantService.findByLogin(login);
+
+		ResponseEntity response;
 		if (participant.isEmpty()) {
-			return new ResponseEntity(HttpStatus.NOT_FOUND);
+			response = new ResponseEntity(HttpStatus.NOT_FOUND);
+		} else {
+			response = new ResponseEntity<Participant>(participant.get(), HttpStatus.OK);
 		}
-		return new ResponseEntity<Participant>(participant.get(), HttpStatus.OK);
+		return response;
 	}
 
 	@RequestMapping(value = "", method = RequestMethod.POST)
 	public ResponseEntity<?> registerParticipant(@RequestBody Participant participant) {
-			System.out.println(participantService.findByLogin(participant.getLogin()));
+			ResponseEntity response;
 
 			if(participantService.findByLogin(participant.getLogin()).isPresent()) {
-				return new ResponseEntity("Unable to create. A participant with login " + participant.getLogin() + " already exist.", HttpStatus.CONFLICT);
+				response = new ResponseEntity("Unable to create. A participant with login " + participant.getLogin() + " already exist.", HttpStatus.CONFLICT);
 			}
 
 			boolean success = participantService.addParticipant(participant);
 
 			if (success == false) {
-				return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+				response = new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+			} else {
+				response = new ResponseEntity(HttpStatus.OK);
 			}
 
-		return new ResponseEntity(HttpStatus.OK);
+		return response;
 	}
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
 	public ResponseEntity<?> deleteParticipant(@PathVariable("id") String login) {
 		boolean success = participantService.deleteParticipant(participantService.findByLogin(login).get());
 
+		ResponseEntity response;
 		if(!success) {
-			return new ResponseEntity(HttpStatus.BAD_REQUEST);
+			response = new ResponseEntity(HttpStatus.BAD_REQUEST);
 		} else {
-			return new ResponseEntity(HttpStatus.OK);
+			response = new ResponseEntity(HttpStatus.OK);
 		}
+
+		return response;
 	}
 
 	@RequestMapping(value = "", method = RequestMethod.PUT)
 	public ResponseEntity<?> updateParticipant(@RequestBody Participant participant) {
 		boolean success = participantService.updateParticipant(participant);
 
+		ResponseEntity response;
 		if(!success) {
-			return new ResponseEntity(HttpStatus.BAD_REQUEST);
+			response = new ResponseEntity(HttpStatus.BAD_REQUEST);
 		} else {
-			return new ResponseEntity(HttpStatus.OK);
+			response = new ResponseEntity(HttpStatus.OK);
 		}
+
+		return response;
 	}
 }
