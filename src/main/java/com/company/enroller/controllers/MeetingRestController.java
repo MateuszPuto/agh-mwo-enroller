@@ -1,6 +1,7 @@
 package com.company.enroller.controllers;
 
 import com.company.enroller.model.Meeting;
+import com.company.enroller.model.Participant;
 import com.company.enroller.persistence.MeetingService;
 import com.company.enroller.persistence.ParticipantService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,28 @@ public class MeetingRestController {
         Collection<Meeting> allMeetings = meetingService.getAll();
 
         return new ResponseEntity<Collection<Meeting>>(allMeetings, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/sorted", method = RequestMethod.GET)
+    public ResponseEntity getSortedMeetings() {
+        Collection<Meeting> sortedMeetings = meetingService.sortedMeetings();
+
+        return new ResponseEntity<Collection<Meeting>>(sortedMeetings, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "find", method = RequestMethod.GET)
+    public ResponseEntity getMeetingsWithKeyword(@RequestParam String keyword) {
+        Collection<Meeting> matchedMeetings = meetingService.findMeetings(keyword);
+
+        return new ResponseEntity<Collection<Meeting>>(matchedMeetings, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "find-participant", method = RequestMethod.GET)
+    public ResponseEntity getMeetingsWithParticipant(@RequestParam String participantLogin) {
+        Collection<Meeting> meetingWithParticipant =
+                meetingService.findMeetingsWithParticipant(participantService.findByLogin(participantLogin).get());
+
+        return new ResponseEntity<Collection<Meeting>>(meetingWithParticipant, HttpStatus.OK);
     }
 
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.GET)
