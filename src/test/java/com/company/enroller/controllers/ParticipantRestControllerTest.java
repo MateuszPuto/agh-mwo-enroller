@@ -9,7 +9,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Collection;
+import java.util.Optional;
 
+import com.company.enroller.model.Meeting;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,4 +51,15 @@ public class ParticipantRestControllerTest {
 				.andExpect(jsonPath("$", hasSize(1))).andExpect(jsonPath("$[0].login", is(participant.getLogin())));
 	}
 
+	@Test
+	public void getParticipant() throws Exception {
+		Participant participant = new Participant();
+		participant.setLogin("testlogin2");
+		participant.setPassword("testpassword2");
+
+		given(participantService.findByLogin(participant.getLogin())).willReturn(Optional.of(participant));
+
+		mvc.perform(get(String.format("/participants/%s", participant.getLogin())).contentType(MediaType.TEXT_PLAIN)).andExpect(status().isOk())
+				.andExpect(jsonPath("$.login", is(participant.getLogin())));
+	}
 }
