@@ -63,4 +63,19 @@ public class MeetingService {
 
 		return success;
 	}
+
+	public boolean deleteMeeting(Meeting meeting) {
+		Session session = connector.getSession();
+
+		boolean success = false;
+		if(this.findById(meeting.getId()).isPresent()) {
+			Transaction transaction = session.beginTransaction();
+			session.delete(meeting);
+			transaction.commit();
+
+			success = true;
+		}
+
+		return success;
+	}
 }

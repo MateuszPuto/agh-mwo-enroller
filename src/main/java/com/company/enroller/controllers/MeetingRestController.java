@@ -80,4 +80,41 @@ public class MeetingRestController {
 
         return new ResponseEntity(meeting.getParticipants(), HttpStatus.OK);
     }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity deleteMeeting(@PathVariable("id") long id) {
+        boolean success = meetingService.deleteMeeting(meetingService.findById(id).get());
+
+        ResponseEntity response;
+        if(!success) {
+            response = new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        } else {
+            response = new ResponseEntity(HttpStatus.OK);
+        }
+
+        return response;
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    public ResponseEntity updateMeeting(@PathVariable long id, @RequestBody Meeting meeting) {
+        ResponseEntity response;
+        if(id != meeting.getId()) {
+            response = new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+
+        boolean success = meetingService.updateMeeting(meeting);
+
+        if(!success) {
+            response = new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        } else {
+            response = new ResponseEntity(HttpStatus.OK);
+        }
+
+        return response;
+    }
+
+    @RequestMapping(value = "/delete-participant/{id}", method = RequestMethod.DELETE)
+    public void deleteParticipant(@PathVariable long id, @RequestParam String participantLogin) {
+        meetingService.findById(id).get().removeParticipant(participantService.findByLogin(participantLogin).get());
+    }
 }
